@@ -1,5 +1,6 @@
 %{!?_pkgdocdir: %global _pkgdocdir %{_docdir}/%{name}-%{version}}
 %global pkgname	phpMyAdmin
+%define sandbox /usr/clearos/sandbox
 
 # Having below mentioned separate projects externally or only internally?
 %global gettext	1
@@ -34,7 +35,7 @@ Source3:	phpMyAdmin.nginx
 %if 0%{?rhel} != 5
 Requires:	php(language) >= 5.3.0, php-filter, php-xmlwriter
 %else
-Requires:	php(api) >= 20090626, php-xml >= 5.3.0
+Requires:	webconfig-php(api) >= 20090626, webconfig-php-xml >= 5.3.0
 %endif
 %if %{with_nginx}
 Requires:	nginx-filesystem
@@ -43,17 +44,19 @@ Requires:	nginx-filesystem
 Requires:	httpd-filesystem
 Requires:	php(httpd)
 %endif
-Requires:	webserver, php-bz2, php-ctype, php-curl, php-date, php-gd >= 5.3.0, php-iconv
-Requires:	php-json, php-libxml, php-mbstring >= 5.3.0, php-mysql >= 5.3.0, php-mysqli
-Requires:	php-openssl, php-pcre, php-session, php-simplexml, php-spl, php-zip, php-zlib
+Requires:	webconfig-webserver, webconfig-php-bz2, webconfig-php-ctype, webconfig-php-curl, webconfig-php-date
+Requires:	webconfig-php-gd >= 5.3.0, webconfig-php-iconv, webconfig-php-json, webconfig-php-libxml
+Requires:	webconfig-php-mbstring >= 5.3.0, webconfig-php-mysql >= 5.3.0, webconfig-php-mysqli
+Requires:	webconfig-php-openssl, webconfig-php-pcre, webconfig-php-session, webconfig-php-simplexml
+Requires:	webconfig-php-spl, webconfig-php-zip, webconfig-php-zlib
 %if 0%{?gettext}
-Requires:	php-php-gettext
+Requires:	webconfig-php-gettext
 %endif
 # Optional runtime requirements for tcpdf: php-openssl, php-tidy (usually not required in phpMyAdmin)
 %if 0%{?tcpdf}
 Requires:	php-tcpdf, php-tcpdf-dejavu-sans-fonts
 %else
-Requires:	php-hash, php-xml >= 5.3.0
+Requires:	webconfig-php-hash, webconfig-php-xml >= 5.3.0
 %endif
 %if 0%{?rhel} == 5
 Provides:	phpMyAdmin = %{version}-%{release}, phpMyAdmin3 = %{version}-%{release}
@@ -124,7 +127,7 @@ rm -rf $RPM_BUILD_ROOT
 mkdir -p $RPM_BUILD_ROOT%{_datadir}/%{pkgname}
 mkdir -p $RPM_BUILD_ROOT%{_localstatedir}/lib/%{pkgname}/{upload,save,config}/
 cp -ad * $RPM_BUILD_ROOT%{_datadir}/%{pkgname}/
-install -Dpm 0644 %{SOURCE2} $RPM_BUILD_ROOT%{_sysconfdir}/httpd/conf.d/%{pkgname}.conf
+install -Dpm 0644 %{SOURCE2} $RPM_BUILD_ROOT%{sandbox}%{_sysconfdir}/httpd/conf.d/%{pkgname}.conf
 install -Dpm 0640 %{SOURCE1} $RPM_BUILD_ROOT%{_sysconfdir}/%{pkgname}/config.inc.php
 %if %{with_nginx}
 install -Dpm 0644 %{SOURCE3} $RPM_BUILD_ROOT%{_sysconfdir}/nginx/default.d/%{pkgname}.conf
@@ -151,9 +154,24 @@ mv -f $RPM_BUILD_ROOT%{_datadir}/%{pkgname}/libraries/tcpdf/LICENSE.TXT LICENSE-
 rm -rf $RPM_BUILD_ROOT
 
 %post
-# Generate a secret key for this installation
-sed -e "/'blowfish_secret'/s/MUSTBECHANGEDONINSTALL/$RANDOM$RANDOM$RANDOM$RANDOM/" \
-    -i %{_sysconfdir}/%{pkgname}/config.inc.php
+
+# Add blowfish support
+CHECK=`grep "^\$cfg\[['\"]blowfish_secret['\"]\]" /etc/phpMyAdmin/config.inc.php`
+if [ -z "$CHECK" ]; then
+    SECRET=`openssl rand -base64 32 | sed 's/\//_/g'`
+    echo "" >> /etc/phpMyAdmin/config.inc.php
+    echo "// Blowfish secret" >> /etc/phpMyAdmin/config.inc.php
+    echo "\$cfg['blowfish_secret'] = '$SECRET';" >> /etc/phpMyAdmin/config.inc.php
+fi
+
+# Add system database hook
+CHECK=`grep "include.*system_database.php" /etc/phpMyAdmin/config.inc.php`
+if [ -z "$CHECK" ]; then
+    echo "" >> /etc/phpMyAdmin/config.inc.php
+    echo "// ClearOS system database definition" >> /etc/phpMyAdmin/config.inc.php
+    echo "if (file_exists('/etc/phpMyAdmin/system_database.php'))" >> /etc/phpMyAdmin/config.inc.php
+    echo "    include '/etc/phpMyAdmin/system_database.php';" >> /etc/phpMyAdmin/config.inc.php
+fi
 
 %files
 %defattr(-,root,root,-)
@@ -161,16 +179,16 @@ sed -e "/'blowfish_secret'/s/MUSTBECHANGEDONINSTALL/$RANDOM$RANDOM$RANDOM$RANDOM
 %license LICENSE*
 %doc ChangeLog README DCO doc/html/ examples/
 %{_datadir}/%{pkgname}/
-%dir %attr(0750,root,apache) %{_sysconfdir}/%{pkgname}/
-%config(noreplace) %attr(0640,root,apache) %{_sysconfdir}/%{pkgname}/config.inc.php
-%config(noreplace) %{_sysconfdir}/httpd/conf.d/%{pkgname}.conf
+%dir %attr(0750,root,webconfig) %{_sysconfdir}/%{pkgname}/
+%config(noreplace) %attr(0640,root,webconfig) %{_sysconfdir}/%{pkgname}/config.inc.php
+%config(noreplace) %{sandbox}%{_sysconfdir}/httpd/conf.d/%{pkgname}.conf
 %if %{with_nginx}
 %config(noreplace) %{_sysconfdir}/nginx/default.d/%{pkgname}.conf
 %endif
 %dir %{_localstatedir}/lib/%{pkgname}/
-%dir %attr(0750,apache,apache) %{_localstatedir}/lib/%{pkgname}/upload/
-%dir %attr(0750,apache,apache) %{_localstatedir}/lib/%{pkgname}/save/
-%dir %attr(0750,apache,apache) %{_localstatedir}/lib/%{pkgname}/config/
+%dir %attr(0700,webconfig,webconfig) %{_localstatedir}/lib/%{pkgname}/upload/
+%dir %attr(0700,webconfig,webconfig) %{_localstatedir}/lib/%{pkgname}/save/
+%dir %attr(0700,webconfig,webconfig) %{_localstatedir}/lib/%{pkgname}/config/
 
 %changelog
 * Thu Jun 04 2015 Robert Scheck <robert@fedoraproject.org> 4.4.9-1
