@@ -3,8 +3,8 @@
 %define sandbox /usr/clearos/sandbox
 
 # Having below mentioned separate projects externally or only internally?
-%global gettext	1
-%global tcpdf	1
+%global gettext	0
+%global tcpdf	0
 
 %if 0%{?fedora} >= 21
 # nginx 1.6 with nginx-filesystem
@@ -19,7 +19,7 @@
 Summary:	Handle the administration of MySQL over the World Wide Web
 Name:		phpMyAdmin
 Version:	4.4.11
-Release:	1%{?dist}
+Release:	1%{?dist}.1
 # MIT (js/jquery/, js/canvg/, js/codemirror/, libraries/sql-formatter/),
 # BSD (libraries/plugins/auth/recaptcha/),
 # GPLv2+ (the rest)
@@ -50,7 +50,8 @@ Requires:	webconfig-php-mbstring >= 5.3.0, webconfig-php-mysql >= 5.3.0, webconf
 Requires:	webconfig-php-openssl, webconfig-php-pcre, webconfig-php-session, webconfig-php-simplexml
 Requires:	webconfig-php-spl, webconfig-php-zip, webconfig-php-zlib
 %if 0%{?gettext}
-Requires:	webconfig-php-gettext
+# Note: this package does not exist, see tracker #3631
+Requires:	webconfig-php-php-gettext
 %endif
 # Optional runtime requirements for tcpdf: php-openssl, php-tidy (usually not required in phpMyAdmin)
 %if 0%{?tcpdf}
@@ -191,6 +192,9 @@ fi
 %dir %attr(0700,webconfig,webconfig) %{_localstatedir}/lib/%{pkgname}/config/
 
 %changelog
+* Tue Jul 14 2015 Developer <developer@clearfoundation.com> 4.4.11-1.clear.1
+- Tuned for ClearOS
+
 * Mon Jul 06 2015 Robert Scheck <robert@fedoraproject.org> 4.4.11-1
 - Upgrade to 4.4.11
 
