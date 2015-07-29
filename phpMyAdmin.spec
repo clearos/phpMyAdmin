@@ -193,7 +193,7 @@ fi
 %dir %attr(0700,webconfig,webconfig) %{_localstatedir}/lib/%{pkgname}/config/
 
 %changelog
-* Wed 29 2015 Developer <developer@clearfoundation.com> 4.4.12-1.clear
+* Wed Jul 29 2015 Developer <developer@clearfoundation.com> 4.4.12-1.clear
 - Tuned for ClearOS
 
 * Thu Jul 21 2015 Robert Scheck <robert@fedoraproject.org> 4.4.12-1
