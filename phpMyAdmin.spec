@@ -18,15 +18,15 @@
 
 Summary:	Handle the administration of MySQL over the World Wide Web
 Name:		phpMyAdmin
-Version:	4.4.11
-Release:	1%{?dist}.1
+Version:	4.4.12
+Release:	1%{?dist}
 # MIT (js/jquery/, js/canvg/, js/codemirror/, libraries/sql-formatter/),
 # BSD (libraries/plugins/auth/recaptcha/),
 # GPLv2+ (the rest)
 License:	GPLv2+ and MIT and BSD
 Group:		Applications/Internet
-URL:		http://www.phpmyadmin.net/
-Source0:	http://downloads.sourceforge.net/phpmyadmin/%{pkgname}-%{version}-all-languages.tar.xz
+URL:		https://www.phpmyadmin.net/
+Source0:	https://files.phpmyadmin.net/%{name}/%{version}/%{name}-%{version}-all-languages.tar.xz
 Source1:	phpMyAdmin-config.inc.php
 Source2:	phpMyAdmin.htaccess
 Source3:	phpMyAdmin.nginx
@@ -43,6 +43,7 @@ Requires:	nginx-filesystem
 %if %{with_httpd}
 Requires:	httpd-filesystem
 Requires:	php(httpd)
+Suggests:	httpd
 %endif
 Requires:	webconfig-webserver, webconfig-php-bz2, webconfig-php-ctype, webconfig-php-curl, webconfig-php-date
 Requires:	webconfig-php-gd >= 5.3.0, webconfig-php-iconv, webconfig-php-json, webconfig-php-libxml
@@ -192,8 +193,11 @@ fi
 %dir %attr(0700,webconfig,webconfig) %{_localstatedir}/lib/%{pkgname}/config/
 
 %changelog
-* Tue Jul 14 2015 Developer <developer@clearfoundation.com> 4.4.11-1.clear.1
+* Wed 29 2015 Developer <developer@clearfoundation.com> 4.4.12-1.clear
 - Tuned for ClearOS
+
+* Thu Jul 21 2015 Robert Scheck <robert@fedoraproject.org> 4.4.12-1
+- Upgrade to 4.4.12 (thanks to Remi Collet)
 
 * Mon Jul 06 2015 Robert Scheck <robert@fedoraproject.org> 4.4.11-1
 - Upgrade to 4.4.11
