@@ -17,8 +17,8 @@
 
 Summary:	Handle the administration of MySQL over the World Wide Web
 Name:		phpMyAdmin
-Version:	4.4.15.8
-Release:	2%{?dist}
+Version:	4.4.15.9
+Release:	1%{?dist}
 # MIT (js/jquery/, js/canvg/, js/codemirror/, libraries/sql-formatter/),
 # BSD (libraries/plugins/auth/recaptcha/),
 # GPLv2+ (the rest)
@@ -167,6 +167,9 @@ sed -e "/'blowfish_secret'/s/MUSTBECHANGEDONINSTALL/$(cat /dev/urandom | tr -dc 
 %dir %attr(0750,apache,apache) %{_localstatedir}/lib/%{pkgname}/config/
 
 %changelog
+* Mon Nov 28 2016 Robert Scheck <robert@fedoraproject.org> 4.4.15.9-1
+- Upgrade to 4.4.15.9 (#1399197)
+
 * Sun Aug 28 2016 Robert Scheck <robert@fedoraproject.org> 4.4.15.8-2
 - Use 'blowfish_secret' with 32 characters for new installation
 
