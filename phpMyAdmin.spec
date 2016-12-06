@@ -18,7 +18,7 @@
 
 Summary:	Handle the administration of MySQL over the World Wide Web
 Name:		phpMyAdmin
-Version:	4.4.12
+Version:	4.4.15.9
 Release:	1%{?dist}
 # MIT (js/jquery/, js/canvg/, js/codemirror/, libraries/sql-formatter/),
 # BSD (libraries/plugins/auth/recaptcha/),
@@ -193,8 +193,53 @@ fi
 %dir %attr(0700,webconfig,webconfig) %{_localstatedir}/lib/%{pkgname}/config/
 
 %changelog
-* Wed Jul 29 2015 Developer <developer@clearfoundation.com> 4.4.12-1.clear
+* Mon Dec 05 2016 Developer <developer@clearfoundation.com> 4.4.15.9-1.clear
 - Tuned for ClearOS
+
+* Mon Nov 28 2016 Robert Scheck <robert@fedoraproject.org> 4.4.15.9-1
+- Upgrade to 4.4.15.9 (#1399197)
+
+* Sun Aug 28 2016 Robert Scheck <robert@fedoraproject.org> 4.4.15.8-2
+- Use 'blowfish_secret' with 32 characters for new installation
+
+* Sun Aug 28 2016 Robert Scheck <robert@fedoraproject.org> 4.4.15.8-1
+- Upgrade to 4.4.15.8 (#1370778)
+
+* Thu Jun 23 2016 Robert Scheck <robert@fedoraproject.org> 4.4.15.7-1
+- Upgrade to 4.4.15.7 (#1349500)
+
+* Thu May 26 2016 Robert Scheck <robert@fedoraproject.org> 4.4.15.6-1
+- Upgrade to 4.4.15.6 (#1340065)
+
+* Thu Mar 03 2016 Robert Scheck <robert@fedoraproject.org> 4.4.15.5-1
+- Upgrade to 4.4.15.5 (#1313221, #1313224, #1313695, #1313696)
+
+* Sat Jan 30 2016 Robert Scheck <robert@fedoraproject.org> 4.4.15.4-1
+- Upgrade to 4.4.15.4
+
+* Thu Jan 28 2016 Robert Scheck <robert@fedoraproject.org> 4.4.15.3-1
+- Upgrade to 4.4.15.3
+
+* Fri Dec 25 2015 Robert Scheck <robert@fedoraproject.org> 4.4.15.2-1
+- Upgrade to 4.4.15.2 (#1294254)
+
+* Sun Oct 25 2015 Robert Scheck <robert@fedoraproject.org> 4.4.15.1-1
+- Upgrade to 4.4.15.1 (#1275108)
+
+* Sun Sep 20 2015 Robert Scheck <robert@fedoraproject.org> 4.4.15-1
+- Upgrade to 4.4.15
+
+* Tue Sep 08 2015 Robert Scheck <robert@fedoraproject.org> 4.4.14.1-1
+- Upgrade to 4.4.14.1
+
+* Thu Aug 20 2015 Robert Scheck <robert@fedoraproject.org> 4.4.14-1
+- Upgrade to 4.4.14
+
+* Sat Aug 08 2015 Robert Scheck <robert@fedoraproject.org> 4.4.13.1-1
+- Upgrade to 4.4.13.1
+
+* Fri Aug 07 2015 Robert Scheck <robert@fedoraproject.org> 4.4.13-1
+- Upgrade to 4.4.13
 
 * Thu Jul 21 2015 Robert Scheck <robert@fedoraproject.org> 4.4.12-1
 - Upgrade to 4.4.12 (thanks to Remi Collet)
