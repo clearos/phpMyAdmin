@@ -170,6 +170,9 @@ if [ -z "$CHECK" ]; then
     echo "    include '/etc/phpMyAdmin/system_database.php';" >> /etc/phpMyAdmin/config.inc.php
 fi
 
+chown root.webconfig /etc/phpMyAdmin/config.inc.php
+chmod 0640 /etc/phpMyAdmin/config.inc.php
+
 %files
 %defattr(-,root,root,-)
 %{!?_licensedir:%global license %%doc}
