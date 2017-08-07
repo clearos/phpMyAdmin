@@ -19,7 +19,7 @@
 Summary:	Handle the administration of MySQL over the World Wide Web
 Name:		phpMyAdmin
 Version:	4.4.15.10
-Release:	1%{?dist}
+Release:	2%{?dist}
 # MIT (js/jquery/, js/canvg/, js/codemirror/, libraries/sql-formatter/),
 # BSD (libraries/plugins/auth/recaptcha/),
 # GPLv2+ (the rest)
@@ -27,16 +27,14 @@ License:	GPLv2+ and MIT and BSD
 Group:		Applications/Internet
 URL:		https://www.phpmyadmin.net/
 Source0:	https://files.phpmyadmin.net/%{name}/%{version}/%{name}-%{version}-all-languages.tar.xz
-Source1:	phpMyAdmin-config.inc.php
-Source2:	phpMyAdmin.htaccess
-Source3:	phpMyAdmin.nginx
+
+Source2:	phpMyAdmin-config.inc.php
+Source3:	phpMyAdmin.htaccess
+Source4:	phpMyAdmin.nginx
+Patch0:		phpMyAdmin-4.4.15.10-pmasa-2017-8.patch
 # Optional (and partially redundant) runtime requirements: php-bcmath, php-gmp, php-recode, php-soap,
-# php-mcrypt, php-phpseclib-crypt-aes, php-phpseclib-crypt-random
-%if 0%{?rhel} != 5
-Requires:	php(language) >= 5.3.0, php-filter, php-xmlwriter
-%else
-Requires:	webconfig-php(api) >= 20090626, webconfig-php-xml >= 5.3.0
-%endif
+# php-mcrypt, php-phpseclib-crypt-aes >= 2.0.0, php-phpseclib-crypt-random >= 2.0.0
+Requires:	webconfig-php(language) >= 5.3.7, webconfig-php-filter, webconfig-php-xmlwriter
 %if %{with_nginx}
 Requires:	nginx-filesystem
 %endif
@@ -59,10 +57,6 @@ Requires:	webconfig-php-php-gettext
 Requires:	php-tcpdf, php-tcpdf-dejavu-sans-fonts
 %else
 Requires:	webconfig-php-hash, webconfig-php-xml >= 5.3.0
-%endif
-%if 0%{?rhel} == 5
-Provides:	phpMyAdmin = %{version}-%{release}, phpMyAdmin3 = %{version}-%{release}
-Obsoletes:	phpMyAdmin3 < %{version}-%{release}
 %endif
 Provides:	phpmyadmin = %{version}-%{release}
 BuildArch:	noarch
@@ -90,6 +84,7 @@ like displaying BLOB-data as image or download-link and much more...
 
 %prep
 %setup -q -n %{pkgname}-%{version}-all-languages
+%patch0 -p1
 
 # Setup vendor config file
 sed -e "/'CHANGELOG_FILE'/s@./ChangeLog@%{_pkgdocdir}/ChangeLog@" \
@@ -129,10 +124,10 @@ rm -rf $RPM_BUILD_ROOT
 mkdir -p $RPM_BUILD_ROOT%{_datadir}/%{pkgname}
 mkdir -p $RPM_BUILD_ROOT%{_localstatedir}/lib/%{pkgname}/{upload,save,config}/
 cp -ad * $RPM_BUILD_ROOT%{_datadir}/%{pkgname}/
-install -Dpm 0644 %{SOURCE2} $RPM_BUILD_ROOT%{sandbox}%{_sysconfdir}/httpd/conf.d/%{pkgname}.conf
-install -Dpm 0640 %{SOURCE1} $RPM_BUILD_ROOT%{_sysconfdir}/%{pkgname}/config.inc.php
+install -Dpm 0644 %{SOURCE3} $RPM_BUILD_ROOT%{sandbox}%{_sysconfdir}/httpd/conf.d/%{pkgname}.conf
+install -Dpm 0640 %{SOURCE2} $RPM_BUILD_ROOT%{_sysconfdir}/%{pkgname}/config.inc.php
 %if %{with_nginx}
-install -Dpm 0644 %{SOURCE3} $RPM_BUILD_ROOT%{_sysconfdir}/nginx/default.d/%{pkgname}.conf
+install -Dpm 0644 %{SOURCE4} $RPM_BUILD_ROOT%{_sysconfdir}/nginx/default.d/%{pkgname}.conf
 %endif
 
 rm -f $RPM_BUILD_ROOT%{_datadir}/%{pkgname}/{[CDLR]*,*.txt,config.sample.inc.php}
@@ -193,8 +188,15 @@ fi
 %dir %attr(0700,webconfig,webconfig) %{_localstatedir}/lib/%{pkgname}/config/
 
 %changelog
-* Mon Dec 05 2016 Developer <developer@clearfoundation.com> 4.4.15.9-1.clear
+* Sun Aug 06 2017 Developer <developer@clearfoundation.com> 4.4.15.10-2.clear
 - Tuned for ClearOS
+
+* Mon Jun 26 2017 Robert Scheck <robert@fedoraproject.org> 4.4.15.10-2
+- Added backported patch for PMASA-2017-8 (#1437828, #1464267)
+
+* Thu Feb 23 2017 Robert Scheck <robert@fedoraproject.org> 4.4.15.10-1
+- Upgrade to 4.4.15.10 (#1415405, #1424968, #1415995, #1415996,
+  #1415997, #1415998, #1415999, #1416000, #1416004)
 
 * Mon Nov 28 2016 Robert Scheck <robert@fedoraproject.org> 4.4.15.9-1
 - Upgrade to 4.4.15.9 (#1399197)

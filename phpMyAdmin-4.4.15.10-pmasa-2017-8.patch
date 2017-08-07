@@ -1,0 +1,23 @@
+Backported patch for phpMyAdmin 4.4.x; a vulnerability was discovered where the restrictions
+caused by $cfg['Servers'][$i]['AllowNoPassword'] = false are bypassed under certain PHP versions.
+This can allow the login of users who have no password set even if the administrator has set
+$cfg['Servers'][$i]['AllowNoPassword'] to false (which is also the default).
+
+This behavior depends on the PHP version used (it seems PHP 5 is affected, while PHP 7.0 is not).
+
+Further details:
+ - https://www.phpmyadmin.net/security/PMASA-2017-8/
+ - https://github.com/phpmyadmin/phpmyadmin/commit/b6ca92cc75c8a16001425be7881e73430bcc35b8
+ - https://github.com/phpmyadmin/phpmyadmin/commit/7232271a379396ca1d4b083af051262057003c41
+
+--- phpMyAdmin-4.4.15.10/libraries/common.inc.php		2017-01-23 20:08:47.000000000 +0100
++++ phpMyAdmin-4.4.15.10/libraries/common.inc.php.pmasa-2017-8	2017-06-26 01:52:03.000000000 +0200
+@@ -858,7 +858,7 @@
+                 . ' ' . $cfg['Server']['auth_type']
+             );
+         }
+-        if (isset($_REQUEST['pma_password'])) {
++        if (isset($_REQUEST['pma_password']) && strlen($_REQUEST['pma_password']) > 256) {
+             $_REQUEST['pma_password'] = substr($_REQUEST['pma_password'], 0, 256);
+         }
+         include_once  './libraries/plugins/auth/' . $auth_class . '.class.php';
